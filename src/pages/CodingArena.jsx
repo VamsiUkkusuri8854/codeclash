@@ -6,6 +6,7 @@ import { LANGS, starter } from '../data/challenges';
 import { OPPONENTS } from '../data/leaderboard';
 import { levelInfo } from '../utils/levelSystem';
 import { fmtTime } from '../utils/formatters';
+import { evaluateSubmission } from '../utils/codeEvaluator';
 import CodeEditor from '../components/CodeEditor';
 import { Button, Card, Empty, Modal, ProgressBar, Skeleton, XPBadge, diffClass } from '../components/ui';
 
@@ -35,9 +36,12 @@ export default function CodingArena() {
     setBusy(true); setOut({ running: true });
     setTimeout(() => {
       setBusy(false);
-      const ok = Math.random() < (c.difficulty === 'Hard' ? 0.75 : 0.9), bad = ok ? -1 : Math.floor(Math.random() * total);
-      const tests = Array.from({ length: total }, (_, i) => ({ ok: i !== bad, n: i + 1 }));
-      setOut({ tests, ok, submit, bad: bad + 1 });
+      const evaluation = evaluateSubmission(c, code, lang);
+      const results = evaluation.cases.slice(0, total);
+      const bad = results.findIndex((passed) => !passed);
+      const tests = results.map((passed, i) => ({ ok: passed, n: i + 1 }));
+      const ok = evaluation.supported && bad === -1;
+      setOut({ tests, ok, submit, bad: bad + 1, unsupported: !evaluation.supported });
       if (!ok) { setTries((t) => t + 1); return; }
       if (!submit) { g.markProgress(c.id, 60); return; }
       const acc = Math.round(100 / tries);
@@ -62,7 +66,7 @@ export default function CodingArena() {
             <div className="row"><Button variant="ghost" disabled={busy} onClick={() => { setCode(starter(c, lang)); setOut(null); }}>Reset</Button><Button variant="ghost" disabled={busy} onClick={() => simulate(3, false)}>▶ Run Code</Button><Button disabled={busy} onClick={() => simulate(10, true)}>Submit</Button></div></div>
             <CodeEditor value={code} onChange={setCode} /></Card>
           <Card><h4>Console</h4><pre className="code">{!out ? 'Run your code to see test results.' : out.running ? 'Running...' : out.error ? out.error : <>
-            {out.tests.slice(0, 3).map((t) => `Test Case ${t.n} ${t.ok ? '✓' : '✗'}\n`)}{out.submit ? `${out.tests.filter((t) => t.ok).length}/10 hidden tests passed\n` : ''}{out.ok ? (out.submit ? '\nSubmission Successful' : '\nAll test cases passed.') : `\nWrong Answer on test ${out.bad}. Fix your code and try again.`}</>}</pre></Card>
+            {out.tests.slice(0, 3).map((t) => `Test Case ${t.n} ${t.ok ? '✓' : '✗'}\n`)}{out.submit ? `${out.tests.filter((t) => t.ok).length}/${out.tests.length} tests passed\n` : ''}{out.ok ? (out.submit ? '\nSubmission Successful' : '\nAll test cases passed.') : `\n${out.unsupported ? 'This challenge needs the server evaluator.' : `Wrong Answer on test ${out.bad}. Fix your code and try again.`}`}</>}</pre></Card>
         </div>
       </div>
       <Modal open={!!res}>{res && (res.kind === 'battle' ? <>

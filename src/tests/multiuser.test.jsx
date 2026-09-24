@@ -7,6 +7,7 @@ import { CHALLENGES } from '../data/challenges';
 import { PLAYERS } from '../data/leaderboard';
 import { buildRows } from '../components/LeaderboardTable';
 import { getAllUsers, getCurrentUser } from '../utils/storage';
+import { evaluateSubmission } from '../utils/codeEvaluator';
 
 beforeEach(() => localStorage.clear());
 const mount = () => renderHook(() => useGame(), { wrapper: GameProvider });
@@ -70,6 +71,14 @@ describe('multi-user accounts (spec §12 / §23)', () => {
     expect(h.result.current.s).toMatchObject({ currentStreak: 8, xp: 2575 });
     call(h, (g) => g.completeDaily(CHALLENGES[0]));                           // once per day
     expect(h.result.current.s.xp).toBe(2575);
+  });
+});
+
+describe('challenge evaluation', () => {
+  test('does not pass starter code and executes JavaScript solutions', () => {
+    const challenge = CHALLENGES[0];
+    expect(evaluateSubmission(challenge, 'function twoSum(data) { return [0, 0]; }', 'JavaScript').cases).toEqual([false, false, false]);
+    expect(evaluateSubmission(challenge, 'function twoSum(nums, target) { const seen = new Map(); for (let i = 0; i < nums.length; i++) { const need = target - nums[i]; if (seen.has(need)) return [seen.get(need), i]; seen.set(nums[i], i); } return []; }', 'JavaScript').cases).toEqual([true, true, true]);
   });
 });
 
