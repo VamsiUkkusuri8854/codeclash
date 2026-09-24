@@ -43,7 +43,11 @@ export default function CodingArena() {
       const ok = evaluation.supported && bad === -1;
       setOut({ tests, ok, submit, bad: bad + 1, unsupported: !evaluation.supported });
       if (!ok) { setTries((t) => t + 1); return; }
-      if (!submit) { g.markProgress(c.id, 60); return; }
+      if (!submit) {
+        if (mode === 'practice') g.completeChallenge(c, sec);
+        else g.markProgress(c.id, 60);
+        return;
+      }
       const acc = Math.round(100 / tries);
       if (mode === 'daily') setRes({ kind: 'daily', xp: g.completeDaily(c), time: fmtTime(sec) });
       else if (mode === 'battle') setRes({ kind: 'battle', win: true, ...g.finishBattle(true, info), time: fmtTime(sec), passed: '10/10', acc });
