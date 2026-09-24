@@ -20,7 +20,7 @@ export default function Home() {
         <div className="row center"><Button onClick={() => go('/arena/1')}>Start Coding</Button><Button variant="ghost" onClick={() => go('/challenges')}>Explore Challenges</Button></div>
         <Card className="herocard"><div className="row between"><b>Sample Player</b><LevelBadge level={5} /></div><small>2,450 / 2,500 XP</small><ProgressBar pct={90} /></Card>
       </section>
-      <section className="wrap"><div className="grid4">{[['19', 'Challenges'], ['9', 'Achievements'], ['4', 'Languages'], ['3', 'Battle modes']].map(([v, l]) => <Card key={l} className="center"><b className="big">{v}</b><small>{l}</small></Card>)}</div></section>
+      <section className="wrap"><div className="grid4">{[[`${CHALLENGES.length}+`, 'Practice questions'], ['9', 'Achievements'], ['4', 'Languages'], ['3', 'Battle modes']].map(([v, l]) => <Card key={l} className="center"><b className="big">{v}</b><small>{l}</small></Card>)}</div></section>
       <section className="wrap"><h2>Features</h2><div className="grid">{FEATURES.map(([i, t, d, to]) => <Card key={t} className="hover clickable" onClick={() => go(to)}><div style={{ fontSize: 30 }}>{i}</div><h3>{t}</h3><p className="mut">{d}</p></Card>)}</div></section>
       <section className="wrap"><h2>Popular Challenges</h2><div className="grid">{CHALLENGES.slice(0, 3).map((c) => <ChallengeCard key={c.id} c={c} />)}</div></section>
       <section className="wrap"><h2>Leaderboard Preview</h2><Card><LeaderboardTable compact rows={buildRows(PLAYERS, users, s, 'Global', 3)} /></Card>
