@@ -28,10 +28,24 @@ export const CHALLENGES = RAW.map(([title, difficulty, category, minutes, statem
   outputFormat: 'Return the result described in the problem statement.',
   constraints: ['1 ≤ n ≤ 10^5', 'Aim for O(n) or O(n log n) where possible'],
 }));
+const signature = (c, lang) => {
+  if (c.fn === 'twoSum') return {
+    Java: `public static int[] ${c.fn}(int[] nums, int target)`,
+    Python: `def ${c.fn}(nums, target)`,
+    'C++': `vector<int> ${c.fn}(vector<int>& nums, int target)`,
+    JavaScript: `function ${c.fn}(nums, target)`,
+  }[lang];
+  return {
+    Java: `public static int ${c.fn}(int[] input)`,
+    Python: `def ${c.fn}(data)`,
+    'C++': `int ${c.fn}(vector<int>& data)`,
+    JavaScript: `function ${c.fn}(data)`,
+  }[lang];
+};
 export const starter = (c, lang) => ({
-  Java: `public class Solution {\n    public static int ${c.fn}(int[] input) {\n        // TODO: write your solution\n        return 0;\n    }\n}`,
-  Python: `def ${c.fn}(data):\n    # TODO: write your solution\n    pass`,
-  'C++': `#include <bits/stdc++.h>\nusing namespace std;\n\nint ${c.fn}(vector<int>& data) {\n    // TODO: write your solution\n    return 0;\n}`,
-  JavaScript: `function ${c.fn}(data) {\n  // TODO: write your solution\n}`,
+  Java: `public class Solution {\n    ${signature(c, lang)} {\n        // Input example: ${c.exIn}\n        // TODO: write your solution\n        return ${c.fn === 'twoSum' ? 'new int[0]' : '0'};\n    }\n}`,
+  Python: `${signature(c, lang)}:\n    # Input example: ${c.exIn}\n    # TODO: write your solution\n    pass`,
+  'C++': `#include <bits/stdc++.h>\nusing namespace std;\n\n${signature(c, lang)} {\n    // Input example: ${c.exIn}\n    // TODO: write your solution\n    return ${c.fn === 'twoSum' ? '{}' : '0'};\n}`,
+  JavaScript: `${signature(c, lang)} {\n  // Input example: ${c.exIn}\n  // TODO: write your solution\n}`,
 })[lang];
 export const LANGS = ['Java', 'Python', 'C++', 'JavaScript'];
